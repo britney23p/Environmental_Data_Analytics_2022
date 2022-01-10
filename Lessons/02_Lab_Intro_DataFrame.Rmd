@@ -48,9 +48,13 @@ Is the new object you create a data frame?
 ```{r}
 #Option 1
 class(car_speed)
+#returned "numeric"
 
 #Option 2
 is.data.frame(car_speed)
+#returned "FALSE"
+
+#summary-- the new object that was created was not a data frame -- car_speed only contained Values and was not a data frame.
 ```
 
 How could you make it a data frame?
@@ -59,6 +63,8 @@ How could you make it a data frame?
 df_car_speed <- as.data.frame(car_speed)
 df_car_speed
 class(df_car_speed)
+
+#summary-- assigning a name and using as.data.frame() means that you are creating a data frame-- df_car_speed is no longer just values from a file.
 ```
 
 ## Adding columns to a data frame
@@ -107,7 +113,7 @@ Some useful functions to use with data frames.
 ncol(df)  
 nrow(df)  
 length(df)  #same as ncol
-summary(df)
+summary(df) #shows the summary of dist and speed that you would see in boxplot
 head(df) #show the first 6 rows of df
 
 #If you know the number of the column you want you can refer to that to access column
@@ -116,4 +122,6 @@ df[,1]
 #you could also use this notation to delete columns
 df <- df[,-2]
 df
+#summary--this deleted the second column, which was car_dist
 ```
+

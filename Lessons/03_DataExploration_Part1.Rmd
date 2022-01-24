@@ -36,6 +36,9 @@ If your working directory is not set to the folder you want, you have several op
 ```{r}
 # Absolute file path is commented out
 setwd("/Users/lmm89/OneDrive/Duke_University/7_Spring2021/ENV872_EDA/GitRepo_EDA_S2021/Environmental_Data_Analytics_2021")
+
+#to find out what your working directory is 
+getwd()
 ```
 
 You may change your working directory without coding by going to the Session menu in RStudio and navigating to the Set Working Directory tab. From there, you may select from a series of options to reset your working directory. 

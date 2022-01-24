@@ -92,7 +92,7 @@ median(5, 4, 6, 4, 6)
 # Conditional statements
 4 > 5
 4 < 5
-4 != 5
+4 != 5  ##means 4 is different than 5 --> TRUE
 4 == 5
 
 ```

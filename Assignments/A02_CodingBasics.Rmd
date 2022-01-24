@@ -35,14 +35,19 @@ This exercise accompanies the lessons in Environmental Data Analytics on coding 
 one_hundred_sequence <- seq(1, 100, 4) # from, to, by
 
 #2. 
-mean_sequence <- mean(one_hundred_sequence) #assigning name to the mean function and using the mean function on the sequence from part 1
-mean_sequence #printing the output from the mean of the sequence
+mean_sequence <- mean(one_hundred_sequence) 
+#assigning name to the mean function and using the mean function on the sequence from part 1
+mean_sequence 
+#printing the output from the mean of the sequence
 
-median_sequence <- median(one_hundred_sequence) #assigning name to the median function and using the median function on the sequence from part 1
-median_sequence #printig the output from the median of the sequence
+median_sequence <- median(one_hundred_sequence) 
+#assigning name to the median function and using the median function on the sequence from part 1
+median_sequence 
+#printig the output from the median of the sequence
 
 #3. 
-mean_sequence > median_sequence #testing to see if the mean is greater than th median of the sequence
+mean_sequence > median_sequence 
+#testing to see if the mean is greater than th median of the sequence
 #if mean is greater than median == TRUE and else it is FALSE
 #The correct answer is that it is FALSE because the mean and median have the same value
 

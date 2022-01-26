@@ -1,6 +1,6 @@
 ---
 title: "Assignment 3: Data Exploration"
-author: "Student Name, Section #0"
+author: "Britney Pepper, Section #1"
 output: pdf_document
 geometry: margin=2.54cm
 ---

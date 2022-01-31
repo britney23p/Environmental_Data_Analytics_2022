@@ -126,6 +126,11 @@ In dplyr, there are several types of join functions:
 
 Let's say we want to generate a new dataset that contains all possible physical and chemical data for Peter and Paul Lakes. In this case, we want to do a full join.
 
+#Use rbind and cbind when we know that the data have the same number of rows and are identical 
+#preferrable to use the Join functions
+
+
+
 ```{r}
 
 NTL.phys.nutrient.data.PeterPaul <- full_join(NTL.phys.data.PeterPaul.subset, NTL.nutrient.data.PeterPaul.subset)

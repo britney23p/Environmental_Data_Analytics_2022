@@ -14,6 +14,10 @@ editor_options:
 3- Practice wrangling datasets with dplyr functions
 
 ## Set up your session
+```{r, message = FALSE }
+getwd()
+setwd("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Lessons")
+```
 
 Today we will work with a dataset from the [North Temperate Lakes Long-Term Ecological Research Station](https://lter.limnology.wisc.edu/about/overview). The NTL-LTER is located in the boreal zone in northern Wisconsin, USA. We will use the [chemical and physical limnology dataset](https://lter.limnology.wisc.edu/content/cascade-project-north-temperate-lakes-lter-core-data-physical-and-chemical-limnology-1984), running from 1984-2016. 
 
@@ -22,12 +26,11 @@ Opening discussion: why might we be interested in long-term observations of temp
 > Add notes here: 
 
 ```{r, message = FALSE}
-getwd()
-#install.packages(tidyverse)
+install.packages(tidyverse)
 library(tidyverse)
-#install.packages(lubridate)
+install.packages(lubridate)
 library(lubridate)
-NTL.phys.data <- read.csv("./Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv", stringsAsFactors = TRUE)
+NTL.phys.data <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/NTL-LTER_Lake_ChemistryPhysics_Raw.csv", stringsAsFactors = TRUE)
 
 class(NTL.phys.data$sampledate)
 # Format sampledate as date
@@ -44,29 +47,32 @@ class(NTL.phys.data$lakeid)
 class(NTL.phys.data$depth)
 
 # dplyr filtering
-NTL.phys.data.surface <- filter(NTL.phys.data, depth == 0)
+NTL.phys.data.surface <- filter(NTL.phys.data, depth == 0) #want data for when the depth value is 0
 
 # Choose multiple conditions to filter
-summary(NTL.phys.data$lakename)
-NTL.phys.data.PeterPaul <- filter(NTL.phys.data, lakename %in% c("Paul Lake", "Peter Lake"))
+summary(NTL.phys.data$lakename) #shows all the lakes that there are
+NTL.phys.data.PeterPaul <- filter(NTL.phys.data, lakename %in% c("Paul Lake", "Peter Lake")) #can have more than two names
+#can be used to establish a range that we want to select
+#c creates vectors with more than one element
 
 # Choose a range of conditions of a numeric or integer variable
 summary(NTL.phys.data$daynum)
-NTL.phys.data.JunethruOctober <- filter(NTL.phys.data, daynum %in% c(152:304))
+NTL.phys.data.JunethruOctober <- filter(NTL.phys.data, daynum %in% c(152:304)) # everything included in the rance c() for the column daynum
 
 # Exercise 1: 
 # filter NTL.phys.data for the year 1999
 # what code do you need to use, based on the class of the variable?
-
+NTL.phys.data.year1999 <- filter(NTL.phys.data, year4 == 1999)
 
 # Exercise 2: 
 # filter NTL.phys.data for Tuesday Lake from 1990 through 1999.
+NTL.phys.data.TuesdayLake <- filter(NTL.phys.data, year4 %in% c(1990:1999), lakename %in% c("Tuesday Lake"))
 
 
 ```
 Question: Why don't we filter using row numbers?
 
-> Answer: 
+> Answer: There is a lot of data and it would be hard to know where the data in each row ends or starts. It is much easier to filter based on what we want to pull.
 
 ## Pipes
 
@@ -82,12 +88,31 @@ NTL.phys.data.processed <-
   mutate(temperature_F = (temperature_C*9/5) + 32)
 
 #Exercise 3: Using a pipe filter NTL.phys.data for Tuesday Lake from 1990 through 1999 only for July 
+NTL.phys.data.pipe.90s.july <- 
+  NTL.phys.data %>%
+  filter(lakename == "Tuesday Lake") %>%
+  filter(year4 %in% c(1990:1999)) %>%
+  mutate(sample_month = month(sampledate)) %>%
+  filter(sample_month == 7)
+View(NTL.phys.data.pipe.90s.july)
 
+#or
+NTL.phys.data.pipe.90s.july2 <- 
+  NTL.phys.data %>%
+  filter(lakename == "Tuesday Lake") %>%
+  filter(year4 %in% c(1990:1999)) %>%
+  filter(month(sampledat) == 7)
 
 
 
 
 #Exercise 4: Using the data from part 3, a pipe and the summarise() function find the mean surface temperature (hints: you will need to add another filter for depth==0). Make sure you eliminate NAs before computing the means
+
+NTL.phys.data.Ex4 <-
+  NTL.phys.data.pipe.90s.july %>%
+  filter(depth == 0) %>%
+  filter(!is.na(temperature_C)) %>%
+  summarise(mean=mean(temperature_C))
 
   
 ```

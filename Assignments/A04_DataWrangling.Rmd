@@ -25,6 +25,13 @@ The completed exercise is due on Monday, Feb 7 @ 7:00pm.
 
 ```{r, message = FALSE}
 #1
+getwd()
+library(plyr)
+library(tidyverse)
+library(lubridate)
+EPAair_O3_NC2018 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/EPAair_O3_NC2018_raw.csv")
+EPAair_O3_NC2019 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/EPAair_O3_NC2019_raw.csv")
+EPAair_PM25_NC2018
 
 #2
 ```

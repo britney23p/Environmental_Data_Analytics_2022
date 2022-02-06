@@ -123,7 +123,7 @@ For gather we will use `pivot_longer` and for spread we will use `pivot_wider`.
 
 ```{r}
 #Exercise 5: gather irradiance data (measured in the water column and measured on the deck of the sampling boat) into one column using pivot_longer
-
+pivot_longer()
 
 #Exercise 6: spread temperatureC into more than one column based on the depth
 

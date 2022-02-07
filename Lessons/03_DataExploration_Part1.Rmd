@@ -35,14 +35,14 @@ If your working directory is not set to the folder you want, you have several op
 
 ```{r}
 # Absolute file path is commented out
-<<<<<<< HEAD
+
 setwd("/Users/lmm89/OneDrive/Duke_University/7_Spring2021/ENV872_EDA/GitRepo_EDA_S2021/Environmental_Data_Analytics_2021")
 
 #to find out what your working directory is 
 getwd()
-=======
+
 setwd("/Users/lmm89/OneDrive/Duke_University/9_Spring2022/ENV872_EDA/GitRep/Environmental_Data_Analytics_2022")
->>>>>>> b3c7106116c07efb5453f2e1b6ba3c74dfab9fdd
+
 ```
 
 You may change your working directory without coding by going to the Session menu in RStudio and navigating to the Set Working Directory tab. From there, you may select from a series of options to reset your working directory. 
@@ -107,14 +107,13 @@ Commons functions to import datasets and store as data frames are *read.table()*
 #read.csv("/Users/lmm89/OneDrive/Duke_University/9_Spring2022/ENV872_EDA/GitRepo/Environmental_Data_Analytics_2022/Data/Raw/USGS_Site02085000_Flow_Raw.csv")
 
 # Relative file path (friendly for users regardless of machine)
-<<<<<<< HEAD
+
 USGS.flow.data <- read.csv("../Data/Raw/USGS_Site02085000_Flow_Raw.csv", stringsAsFactor = TRUE)
 #***NEED TO USE THE STRINGSASFACTORS = TRUE to make THEM INTO STRINGS FOR VECTORS!!!!!!!
 
-=======
 getwd()
 USGS.flow.data <- read.csv("./Data/Raw/USGS_Site02085000_Flow_Raw.csv",stringsAsFactors = TRUE)  
->>>>>>> b3c7106116c07efb5453f2e1b6ba3c74dfab9fdd
+
 #For knitting the .Rmd file you need to added an extra "." to the relative path
 # R Markdown documents are compiled in separate R sessions to enhance reproducibility, so you current R console has nothing to do with the compilation of the R Markdown documents.
 

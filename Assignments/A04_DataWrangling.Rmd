@@ -25,15 +25,47 @@ The completed exercise is due on Monday, Feb 7 @ 7:00pm.
 
 ```{r, message = FALSE}
 #1
+#set working directory
 getwd()
+
+#load packages
+#install.packages(tidyverse)
+#install.packages(lubridate)
 library(plyr)
 library(tidyverse)
 library(lubridate)
-EPAair_O3_NC2018 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/EPAair_O3_NC2018_raw.csv")
-EPAair_O3_NC2019 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/EPAair_O3_NC2019_raw.csv")
-EPAair_PM25_NC2018
+
+#load data
+EPAair_O3_NC2018 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/EPAair_O3_NC2018_raw.csv", stringsAsFactors = TRUE)
+EPAair_O3_NC2019 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/EPAair_O3_NC2019_raw.csv", stringsAsFactors = TRUE)
+EPAair_PM25_NC2018 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/EPAair_PM25_NC2018_raw.csv", stringsAsFactors = TRUE)
+EPAair_PM25_NC2019 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/EPAair_PM25_NC2019_raw.csv", stringsAsFactors = TRUE)
 
 #2
+view(EPAair_O3_NC2018)
+colnames(EPAair_O3_NC2018)
+head(EPAair_O3_NC2018)
+str(EPAair_O3_NC2018)
+dim(EPAair_O3_NC2018)
+
+view(EPAair_O3_NC2019)
+colnames(EPAair_O3_NC2019)
+head(EPAair_O3_NC2019)
+str(EPAair_O3_NC2019)
+dim(EPAair_O3_NC2019)
+
+view(EPAair_PM25_NC2018)
+colnames(EPAair_PM25_NC2018)
+head(EPAair_PM25_NC2018)
+str(EPAair_PM25_NC2018)
+dim(EPAair_PM25_NC2018)
+
+view(EPAair_PM25_NC2019)
+colnames(EPAair_PM25_NC2019)
+head(EPAair_PM25_NC2019)
+str(EPAair_PM25_NC2019)
+dim(EPAair_PM25_NC2019)
+
 ```
 
 ## Wrangle individual datasets to create processed files.
@@ -44,6 +76,7 @@ EPAair_PM25_NC2018
 
 ```{r}
 #3
+NTL.phys.data$sampledate <- as.Date(NTL.phys.data$sampledate, format = "%m/%d/%y")
 
 #4
 

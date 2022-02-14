@@ -23,9 +23,9 @@ The completed exercise is due on Monday, February 14 at 7:00 pm.
 ##My Set Up
 ```{r}
 #pov: me hoping this works because nothing else does
-install.packages("formatR")
-library(formatR)
-knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60), tidy=TRUE, echo=TRUE)
+#install.packages("formatR")
+#library(formatR)
+#knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60), tidy=TRUE, echo=TRUE)
 ```
 
 
@@ -45,8 +45,8 @@ getwd()
 setwd("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022")
 
 #install packages
-install.packages("tidyverse")
-install.packages("cowplot")
+#install.packages("tidyverse")
+#install.packages("cowplot")
 
 library(tidyverse)
 library(cowplot)
@@ -72,6 +72,7 @@ mytheme <- theme_classic(base_size = 14) +
   theme(axis.text = element_text(color = "black"), 
         legend.position = "top")
 theme_set(mytheme)
+
 ```
 
 ## Create graphs
@@ -127,21 +128,23 @@ print(TN)
 
 #cowplot
 #save three plots as object
-plot_grid()
-plot_grid(NvsP2, Nutrientplot, nrow = 2, align = 'h', rel_heights = c(1.25, 1))
+all_plots <- plot_grid(temp + theme(legend.position = "none"), TP + theme(legend.position = "none"), TN + theme(legend.position = "none"), nrow=1)
+print(all_plots)
+
 
 #create another object just for legend 
 cowplot_legend <- get_legend(temp)
 
 #use plot grid again with two rows -- one for object with three plots and one for the object with the legend
-plot_grid(___, cowplot_legend, nrow=2, rel_height = c(3, 0.3)) 
+plot_all_grid <- plot_grid(all_plots, cowplot_legend, nrow=2, rel_height = c(3, 0.3)) 
+print(plot_all_grid)
 
 
 ```
 
 Question: What do you observe about the variables of interest over seasons and between lakes? 
 
-> Answer: 
+> Answer: The average temperature was consistently higher for Paul Lake than Peter Lake until the late fall/winter months. The temperatures also had more variability in the summer months with a wider range. The average total amount of phosphorus was consistenly greater for Peter Lake and Paul Lake, and the concentration seems to increase in range in July. The average total nitrogen content almost always greater than in Peter Lake than in Paul Lake. The range seemed to increase in the summer months, although the range for Peter Lake appeared to be much larger.
 
 6. [Niwot Ridge] Plot a subset of the litter dataset by displaying only the "Needles" functional group. Plot the dry mass of needle litter by date and separate by NLCD class with a color aesthetic. (no need to adjust the name of each land use)
 
@@ -159,7 +162,7 @@ print(questionSix)
 questionSeven <-
   ggplot(subset(niwotridegelitter, functionalGroup == "Needles"),
          aes(x=collectDate, y=dryMass)) +
-  geom_point() +
+  geom_point(aes(color = nlcdClass))+
   facet_wrap(vars(nlcdClass), nrow = 3)
 print(questionSeven)
 
@@ -167,4 +170,4 @@ print(questionSeven)
 ```
 Question: Which of these plots (6 vs. 7) do you think is more effective, and why? 
 
-> Answer:
+> Answer: I think plot 7 was more effective. It separated the the NLCD classes into three separate facets, which allowed you to compare each individual facet across the years. It was much easier to analyze the data because I was not trying to see trends in the data by just using color differences on one graph like in plot 6.

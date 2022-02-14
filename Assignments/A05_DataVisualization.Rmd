@@ -1,8 +1,8 @@
 ---
 title: "Assignment 5: Data Visualization"
-author: "Student Name"
+author: "Britney Pepper"
 output: pdf_document
-geometry: margin=2.54cm
+geometry: margin=1.9cm
 editor_options: 
   chunk_output_type: console
 ---
@@ -24,8 +24,8 @@ The completed exercise is due on Monday, February 14 at 7:00 pm.
 ```{r}
 #pov: me hoping this works because nothing else does
 #install.packages("formatR")
-#library(formatR)
-#knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60), tidy=TRUE, echo=TRUE)
+library(formatR)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60), tidy=TRUE, echo=TRUE)
 ```
 
 
@@ -52,14 +52,18 @@ library(tidyverse)
 library(cowplot)
 
 #load the data
-peterpaullakes <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv", stringsAsFactors = TRUE)
-niwotridegelitter <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv", stringsAsFactors = TRUE)
+peterpaullakes <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv", 
+                           stringsAsFactors = TRUE)
+niwotridegelitter <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv", 
+                              stringsAsFactors = TRUE)
 
 
 #2 
 #both set to characters instead of date == need to change
-peterpaullakes$sampledate <- as.Date(peterpaullakes$sampledate, format = "%Y-%m-%d")
-niwotridegelitter$collectDate <- as.Date(niwotridegelitter$collectDate, format = "%Y-%m-%d")
+peterpaullakes$sampledate <- as.Date(peterpaullakes$sampledate,
+                                     format = "%Y-%m-%d")
+niwotridegelitter$collectDate <- as.Date(niwotridegelitter$collectDate, 
+                                         format = "%Y-%m-%d")
 
 
 ```
@@ -69,8 +73,7 @@ niwotridegelitter$collectDate <- as.Date(niwotridegelitter$collectDate, format =
 ```{r, fig.height = 3, fig.width = 4, warning = FALSE}
 #3
 mytheme <- theme_classic(base_size = 14) +
-  theme(axis.text = element_text(color = "black"), 
-        legend.position = "top")
+  theme(axis.text = element_text(color = "black"))
 theme_set(mytheme)
 
 ```
@@ -101,12 +104,11 @@ print(phosphoorusVSphosphate)
 
 peterpaullakes$month <- as.factor(peterpaullakes$month)
 
-
 #boxplot: temp
 temp <- ggplot(peterpaullakes, aes(x=month, y = temperature_C)) +
   geom_boxplot(aes(color = lakename))+
   xlab("Month") +
-  ylab("Temperature (˚C)") +
+  ylab("Temperature (C)") +
   labs(color = "Lake Name")
 print(temp)
 
@@ -128,16 +130,24 @@ print(TN)
 
 #cowplot
 #save three plots as object
-all_plots <- plot_grid(temp + theme(legend.position = "none"), TP + theme(legend.position = "none"), TN + theme(legend.position = "none"), nrow=1)
+all_plots <- plot_grid(temp + theme(legend.position = "none"),
+                       TP + theme(legend.position = "none"),
+                       TN + theme(legend.position = "none"),
+                       nrow=1)
 print(all_plots)
 
 
 #create another object just for legend 
 cowplot_legend <- get_legend(temp)
 
-#use plot grid again with two rows -- one for object with three plots and one for the object with the legend
-plot_all_grid <- plot_grid(all_plots, cowplot_legend, nrow=2, rel_height = c(3, 0.3)) 
+#use plot grid again with two rows
+#one for object with three plots and one for the object with the legend
+plot_all_grid <- plot_grid(all_plots, cowplot_legend,
+                           nrow=2, rel_height = c(1, 0.1)) 
 print(plot_all_grid)
+#Note: I tried everything to get the legend
+#to print below the graphs, but I could not
+#get it to :(
 
 
 ```

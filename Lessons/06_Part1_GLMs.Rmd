@@ -43,7 +43,7 @@ getwd()
 library(tidyverse)
 options(scipen = 4)
 
-PeterPaul.chem.nutrients <- read.csv("./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv", stringsAsFactors = TRUE)
+PeterPaul.chem.nutrients <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv", stringsAsFactors = TRUE)
 
 # Set theme
 mytheme <- theme_classic(base_size = 14) +
@@ -57,6 +57,8 @@ A linear regression is comprised of a continuous response variable, plus a combi
 $$ y = \alpha + \beta*x + \epsilon $$
 
 The goal for the linear regression is to find a **line of best fit**, which is the line drawn through the bivariate space that minimizes the total distance of points from the line. This is also called a "least squares" regression. The remainder of the variance not explained by the model is called the **residual error.** 
+
+*Note: we want a mean of 0 and a normal distribution
 
 The linear regression will test the null hypotheses that
 

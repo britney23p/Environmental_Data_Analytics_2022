@@ -101,7 +101,7 @@ print(ntl_lter_july_scatter)
 6. Interpret the figure. What does it suggest with regards to the response of temperature to depth? Do the distribution of points suggest about anything about the linearity of this trend?
 
 > Answer: 
-This figure suggests that there is a negative correlation between depth and temperature. The distribution of points suggest 
+This figure suggests that there is a negative correlation between depth and temperature. As depth increases the temperature decreases. The distribution of points suggest that the trend may not be linear given that the distribution has different temperature ranges at different depths and it looks like the temperature decreases at a greater rate around 2 meters.
 
 
 7. Perform a linear regression to test the relationship and display the results
@@ -117,10 +117,7 @@ summary(lr.depth.temp)
 8. Interpret your model results in words. Include how much of the variability in temperature is explained by changes in depth, the degrees of freedom on which this finding is based, and the statistical significance of the result. Also mention how much temperature is predicted to change for every 1m change in depth. 
 
 > Answer: 
--The R-squared value is 0.7387. This means that 73.8% variability in temperature is explained by changes in depth.
--The degrees of freedom on which the findings are based is 9726.
--The p-value was is than 0.05, so the results were statistically significant. This means that we would reject the null hypothesis and say that there is a difference in the mean lake temperature with depth across all lakes during the month of July.
--The temperature is predicted to decrease by 1.95 degrees Celcius for every 1m change in depth.
+The R-squared value is 0.7387. This means that 73.8% variability in temperature is explained by changes in depth. The degrees of freedom on which the findings are based is 9726. The residual standard error is 3.835. The p-value is less than 0.05, so the results were statistically significant. This means that we would reject the null hypothesis and say that there is a difference in the mean lake temperature with depth across all lakes during the month of July. The temperature is predicted to decrease by 1.95 degrees Celcius for every 1m change in depth.
 
 
 ---
@@ -149,7 +146,7 @@ summary(temp_regression)
 11. What is the final set of explanatory variables that the AIC method suggests we use to predict temperature in our multiple regression? How much of the observed variance does this model explain? Is this an improvement over the model using only depth as the explanatory variable?
 
 > Answer: 
-AIC suggests using depth only
+AIC suggests you would not want to get rid of anything. When you run the step, the AIC increases if you remove one of the variables, so you would not want to remove anything. However, the r-squared value increased slightly to 0.7411, which means that a greater variability in temperature is explained by changes in year4, daynum, and depth.
 
 
 
@@ -175,7 +172,7 @@ summary(temp_totals_anova_lm)
 ```
 
 13. Is there a significant difference in mean temperature among the lakes? Report your findings. 
-> Answer: 
+> Answer: There was a signifiant difference in the mean temperature among the lakes. The p-values for both tests were less than 0.05, so the mean temperature was significantly different and we would reject the null hypothesis.
 
 
 
@@ -201,7 +198,7 @@ print(ntl_lter_lake_temp_scatter)
 #15
 TukeyHSD(temp_totals_anova)
 
-HSD.temp <- HSD.test(temp_totals_anova, "lakename", TRUE)
+HSD.temp <- HSD.test(temp_totals_anova, "lakename", group = TRUE)
 print(HSD.temp)
 
 
@@ -210,7 +207,7 @@ print(HSD.temp)
 16.From the findings above, which lakes have the same mean temperature, statistically speaking, as Peter Lake? Does any lake have a mean temperature that is statistically distinct from all the other lakes?
 
 >Answer:
-Based on the Tukey's HSD test, the lake that has the same mean temperature as Peter Lake is Paul Lake. 
+Based on the Tukey's HSD test, the lakes that have the same mean temperature as Peter Lake is Paul Lake and Ward Lake. None of the lakes have a mean temperature that is statistically different from all the other lakes.
  
  
 

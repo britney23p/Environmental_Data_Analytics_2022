@@ -1,6 +1,6 @@
 ---
 title: "Assignment 7: Time Series Analysis"
-author: "Student Name"
+author: "Britney Pepper"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -29,7 +29,29 @@ The completed exercise is due on Monday, March 14 at 7:00 pm.
 
 ```{r}
 #1
+getwd()
+#setwd("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022")
 
+install.packages("tidyverse")
+install.packages("lubridate")
+install.packages("zoo")
+install.packages("trend")
+install.packages("Kendall")
+install.packages("tseries")
+
+library(tidyverse)
+library(lubridate)
+library(zoo)
+library(trend)
+library(Kendall)
+library(tseries)
+
+
+#Theme
+mytheme <- theme_classic(base_size = 14) +
+  theme(axis.text = element_text(color = "black"), 
+        legend.position = "top")
+theme_set(mytheme)
 ```
 
 
@@ -37,7 +59,7 @@ The completed exercise is due on Monday, March 14 at 7:00 pm.
 
 ```{r, message = FALSE}
 #2
-
+o3_2010 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/Ozone_TimeSeries/EPAair_O3_GraingerNC2010_raw.csv",stringsAsFactors = TRUE)
 
 ```
 

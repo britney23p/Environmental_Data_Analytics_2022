@@ -32,12 +32,12 @@ The completed exercise is due on Monday, March 14 at 7:00 pm.
 getwd()
 #setwd("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022")
 
-install.packages("tidyverse")
-install.packages("lubridate")
-install.packages("zoo")
-install.packages("trend")
-install.packages("Kendall")
-install.packages("tseries")
+#install.packages("tidyverse")
+#install.packages("lubridate")
+#install.packages("zoo")
+#install.packages("trend")
+#install.packages("Kendall")
+#install.packages("tseries")
 
 library(tidyverse)
 library(lubridate)
@@ -59,9 +59,25 @@ theme_set(mytheme)
 
 ```{r, message = FALSE}
 #2
-o3_2010 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/Ozone_TimeSeries/EPAair_O3_GraingerNC2010_raw.csv",stringsAsFactors = TRUE)
 
+#reading the data sets
+o3_2010 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2010_raw.csv", stringsAsFactors = TRUE)
+o3_2011 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2011_raw.csv", stringsAsFactors = TRUE)
+o3_2012 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2012_raw.csv", stringsAsFactors = TRUE)
+o3_2013<- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2013_raw.csv", stringsAsFactors = TRUE)
+o3_2014 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2014_raw.csv", stringsAsFactors = TRUE)
+o3_2015 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2015_raw.csv", stringsAsFactors = TRUE)
+o3_2016 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2016_raw.csv", stringsAsFactors = TRUE)
+o3_2017 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2017_raw.csv", stringsAsFactors = TRUE)
+o3_2018 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2018_raw.csv", stringsAsFactors = TRUE)
+o3_2019 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2019_raw.csv", stringsAsFactors = TRUE)
+
+
+#combining the data sets
+GraingerOzone <- rbind(o3_2010, o3_2011,o3_2012, o3_2013, o3_2014, o3_2015, o3_2016, o3_2017, o3_2018, o3_2019)
+#contains 3589 observation and 20 variables
 ```
+
 
 ## Wrangle
 
@@ -75,12 +91,20 @@ o3_2010 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubReposi
 
 ```{r}
 # 3
+GraingerOzone$Date <- as.Date(GraingerOzone$Date, format = "%m/%d/%Y")
 
 # 4
+GraingerOzoneWrangle <- GraingerOzone %>%
+  select(Date, Daily.Max.8.hour.Ozone.Concentration, DAILY_AQI_VALUE)
 
 # 5
+Days <- as.data.frame(seq.Date(from = as.Date("2010/01/01"), to = as.Date("2019/12/31"), by = "day"))
+names(Days)[1] <- "Date"
 
 # 6
+GraingerOzone <- left_join(Days,GraingerOzoneWrangle, by = "Date")
+
+
 
 ```
 
@@ -90,10 +114,16 @@ o3_2010 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubReposi
 
 ```{r}
 #7
-
+GraingerOzone.line <- 
+  ggplot(GraingerOzone, aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration)) +
+  ylab("Ozone Concentrations (ppm)") +
+  xlab("Date") +
+  geom_smooth(method = "lm")+
+  geom_line()
+print(GraingerOzone.line)
 ```
 
->Answer: 
+>Answer: The plot does suggest a trend in ozone concentration over time. The linear trend line shows a slight negative relationship, but the trend line only represents the average ozone concentration instead of the pattern of the ozone concentration levels. The trend in the concentration is an oscillation where the ozone concentration level increases from the beginning of each the year until the middle of each year before it decreases until the end of the year.
 
 ## Time Series Analysis
 
@@ -103,17 +133,36 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #8
+head(GraingerOzone)
+summary(GraingerOzone$Daily.Max.8.hour.Ozone.Concentration)
+
+GraingerOzone_interp <- 
+  GraingerOzone %>% 
+  mutate(Daily.Max.8.hour.Ozone.Concentration.clean = zoo::na.approx(Daily.Max.8.hour.Ozone.Concentration))
+
+summary(GraingerOzone_interp$Daily.Max.8.hour.Ozone.Concentration.clean)
+
+GraingerOzone_interp_plot <- 
+  ggplot(GraingerOzone_interp, aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration.clean)) +
+  ylab("Interpolated Ozone Concentration")+
+  xlab("Date") +
+  geom_smooth(method = "lm") +
+  geom_line()
+print(GraingerOzone_interp_plot)
 
 ```
 
-> Answer:  
+> Answer: Because the dataset does not have many NA's, there are not many gaps in the data. Therefore, we would not need to use a piecewise constant because there is no need to assume that the missing measurements are equal to the nearest measurements in the data. Also, we are looking to see how the ozone concentrations have changed, so we would not want to assume that the gaps are where the data was constant. We do not need to use Spline because we have data from most days in the year, so there is not much need to go through the quadratic function to fill in the missing data. It is safe to assume that the missing data fall between previous and next measurements because of the daily measurements, and a straight line between the data is a good way to visualize the ozone concentrations changes.
 
 
 9. Create a new data frame called `GaringerOzone.monthly` that contains aggregated data: mean ozone concentrations for each month. In your pipe, you will need to first add columns for year and month to form the groupings. In a separate line of code, create a new Date column with each month-year combination being set as the first day of the month (this is for graphing purposes only)
 
 ```{r}
 #9
-
+GraingerOzone.monthly <- 
+  GraingerOzone %>%
+  
+  
 ```
 
 
@@ -121,7 +170,16 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #10
+f_month <- month(first(GraingerOzone$Date))
+f_year <- year(first(GraingerOzonee$Date))
 
+Grainger.Ozone.monthly.ts <- ts(GraingerOzone$Daily.Max.8.hour.Ozone.Concentration, start = c(f_month, f_year), frequency = 12)
+Grainger.Ozone.daily.ts <- ts(GraingerOzone.monthly$, start = c(f_month, f_year), frequency = 1)
+
+
+#NEED TO INSERT COLUMN NAME FROM #9 FOR DAILY
+
+#monthly data is always frequency=12 and yearly data is always frequency=365
 
 ```
 
@@ -130,7 +188,11 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #11
+Grainger.Ozone.monthly.ts.decomposed <- stl(Grainger.Ozone.monthly.ts, s.window = "periodic")
+plot(Grainger.Ozone.monthly.ts.decomposed)
 
+Grainger.Ozone.daily.ts.decomposed <- stl(Grainger.Ozone.daily.ts, s.window = "periodic")
+plot(Grainger.Ozone.daily.ts.decomposed)
 
 ```
 
@@ -139,18 +201,33 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #12
-
-
+# Run SMK test
+Grainger.Ozone.monthly.ts.trend <- Kendall::SeasonalMannKendall(Grainger.Ozone.monthly.ts)
+summary(Grainger.Ozone.monthly.ts.trend)
 
 ```
 
-> Answer:  
+> Answer: The season Mann-Kendall is most appropriate because we are looking at monthly averages within the dataset. This monthly change can be considered seasonal trends, and the only monotonic trend analysis that is for seasonality is the seasonal Mann-Kendall analysis. The data is also non-parametric, so it fits the sesason Mann-Kendall analysis.
+
 
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
 ```{r}
 # 13
+# We can extract the components and turn them into data frames
+EnoDischarge.late_Components <- as.data.frame(EnoDischarge.late_Decomposed$time.series[,1:3])
 
+EnoDischarge.late_Components <- mutate(EnoDischarge.late_Components,
+        Observed = EnoDischarge.late$discharge.mean,     
+        Date = EnoDischarge.late$datetime)
+
+# Visualize how the trend maps onto the data
+ggplot(EnoDischarge.late_Components) +
+  geom_line(aes(y = Observed, x = Date),  size = 0.25) +
+  geom_line(aes(y = trend, x = Date), color = "#c13d75ff") +
+  geom_hline(yintercept = 0, lty = 2) +
+  ylab(expression("Discharge (ft"^3*"/s)")) +
+  xlab()
 
 
 ```
@@ -165,8 +242,20 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #15
+EnoDischarge.late_Components <- as.data.frame(EnoDischarge.late_Decomposed$time.series[,1:3])
+
+EnoDischarge.late_Components <- mutate(EnoDischarge.late_Components,
+        Observed = EnoDischarge.late$discharge.mean,     
+        Date = EnoDischarge.late$datetime)
 
 #16
+# Run SMK test
+Grainger.Ozone.monthly.ts.trend <- Kendall::SeasonalMannKendall(Grainger.Ozone.monthly.ts)
+summary(Grainger.Ozone.monthly.ts.trend)
+
+#Run MK test
+Grainger.Ozone.daily.ts.trend <- MannKendall(Grainger.Ozone.daily.ts)
+summary(Grainger.Ozone.daily.ts.trend)
 
 ```
 

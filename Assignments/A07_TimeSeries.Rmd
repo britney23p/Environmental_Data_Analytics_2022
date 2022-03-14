@@ -28,6 +28,10 @@ The completed exercise is due on Monday, March 14 at 7:00 pm.
 * Set your ggplot theme
 
 ```{r}
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=50),tidy=TRUE, echo = T)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60), tidy=TRUE, echo=TRUE)
+
 #1
 getwd()
 #setwd("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022")
@@ -74,7 +78,7 @@ o3_2019 <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubReposi
 
 
 #combining the data sets
-GraingerOzone <- rbind(o3_2010, o3_2011,o3_2012, o3_2013, o3_2014, o3_2015, o3_2016, o3_2017, o3_2018, o3_2019)
+GaringerOzone <- rbind(o3_2010, o3_2011,o3_2012, o3_2013, o3_2014, o3_2015, o3_2016, o3_2017, o3_2018, o3_2019)
 #contains 3589 observation and 20 variables
 ```
 
@@ -91,10 +95,10 @@ GraingerOzone <- rbind(o3_2010, o3_2011,o3_2012, o3_2013, o3_2014, o3_2015, o3_2
 
 ```{r}
 # 3
-GraingerOzone$Date <- as.Date(GraingerOzone$Date, format = "%m/%d/%Y")
+GaringerOzone$Date <- as.Date(GaringerOzone$Date, format = "%m/%d/%Y")
 
 # 4
-GraingerOzoneWrangle <- GraingerOzone %>%
+GaringerOzoneWrangle <- GaringerOzone %>%
   select(Date, Daily.Max.8.hour.Ozone.Concentration, DAILY_AQI_VALUE)
 
 # 5
@@ -102,9 +106,7 @@ Days <- as.data.frame(seq.Date(from = as.Date("2010/01/01"), to = as.Date("2019/
 names(Days)[1] <- "Date"
 
 # 6
-GraingerOzone <- left_join(Days,GraingerOzoneWrangle, by = "Date")
-
-
+GaringerOzone <- left_join(Days,GaringerOzoneWrangle, by = "Date")
 
 ```
 
@@ -114,16 +116,17 @@ GraingerOzone <- left_join(Days,GraingerOzoneWrangle, by = "Date")
 
 ```{r}
 #7
-GraingerOzone.line <- 
-  ggplot(GraingerOzone, aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration)) +
+GaringerOzone.line <- 
+  ggplot(GaringerOzone, aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration)) +
   ylab("Ozone Concentrations (ppm)") +
   xlab("Date") +
   geom_smooth(method = "lm")+
   geom_line()
-print(GraingerOzone.line)
+print(GaringerOzone.line)
 ```
 
 >Answer: The plot does suggest a trend in ozone concentration over time. The linear trend line shows a slight negative relationship, but the trend line only represents the average ozone concentration instead of the pattern of the ozone concentration levels. The trend in the concentration is an oscillation where the ozone concentration level increases from the beginning of each the year until the middle of each year before it decreases until the end of the year.
+
 
 ## Time Series Analysis
 
@@ -133,22 +136,25 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #8
-head(GraingerOzone)
-summary(GraingerOzone$Daily.Max.8.hour.Ozone.Concentration)
+head(GaringerOzone)
+summary(GaringerOzone$Daily.Max.8.hour.Ozone.Concentration)
 
-GraingerOzone_interp <- 
-  GraingerOzone %>% 
+GaringerOzone_interp <- 
+  GaringerOzone %>% 
   mutate(Daily.Max.8.hour.Ozone.Concentration.clean = zoo::na.approx(Daily.Max.8.hour.Ozone.Concentration))
+#I  really tried to get this all on the page but I couldn't :( so sorry!
+#Here is what the code is says:
+#mutate(Daily.Max.8.hour.Ozone.Concentration.clean = zoo::na.approx(Daily.Max.8.hour.Ozone.Concentration))
 
-summary(GraingerOzone_interp$Daily.Max.8.hour.Ozone.Concentration.clean)
+summary(GaringerOzone_interp$Daily.Max.8.hour.Ozone.Concentration.clean)
 
-GraingerOzone_interp_plot <- 
-  ggplot(GraingerOzone_interp, aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration.clean)) +
+GaringerOzone_interp_plot <- 
+  ggplot(GaringerOzone_interp, aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration.clean)) +
   ylab("Interpolated Ozone Concentration")+
   xlab("Date") +
-  geom_smooth(method = "lm") +
+  geom_smooth(method = "lm", colour = "blue") +
   geom_line()
-print(GraingerOzone_interp_plot)
+print(GaringerOzone_interp_plot)
 
 ```
 
@@ -159,10 +165,14 @@ print(GraingerOzone_interp_plot)
 
 ```{r}
 #9
-GraingerOzone.monthly <- 
-  GraingerOzone %>%
-  
-  
+GaringerOzone.monthly <- 
+  GaringerOzone_interp %>%
+  mutate(Month = month(Date)) %>%
+  mutate(Year = year(Date)) %>%
+  mutate(Date_M_Y = my(paste0(Month, "-", Year))) %>%
+  dplyr::group_by(Date_M_Y) %>%
+  dplyr::summarise(Month_Mean_O3 = mean(Daily.Max.8.hour.Ozone.Concentration.clean))
+
 ```
 
 
@@ -170,14 +180,12 @@ GraingerOzone.monthly <-
 
 ```{r}
 #10
-f_month <- month(first(GraingerOzone$Date))
-f_year <- year(first(GraingerOzonee$Date))
+f_month <- month(first(GaringerOzone_interp$Date))
+f_year <- year(first(GaringerOzone_interp$Date))
 
-Grainger.Ozone.monthly.ts <- ts(GraingerOzone$Daily.Max.8.hour.Ozone.Concentration, start = c(f_month, f_year), frequency = 12)
-Grainger.Ozone.daily.ts <- ts(GraingerOzone.monthly$, start = c(f_month, f_year), frequency = 1)
+Garinger.Ozone.monthly.ts <- ts(GaringerOzone.monthly$Month_Mean_O3, start = c(f_year, f_month), frequency = 12)
 
-
-#NEED TO INSERT COLUMN NAME FROM #9 FOR DAILY
+Garinger.Ozone.daily.ts <- ts(GaringerOzone_interp$Daily.Max.8.hour.Ozone.Concentration.clean, start = c(f_year, f_month), frequency = 365)
 
 #monthly data is always frequency=12 and yearly data is always frequency=365
 
@@ -188,11 +196,11 @@ Grainger.Ozone.daily.ts <- ts(GraingerOzone.monthly$, start = c(f_month, f_year)
 
 ```{r}
 #11
-Grainger.Ozone.monthly.ts.decomposed <- stl(Grainger.Ozone.monthly.ts, s.window = "periodic")
-plot(Grainger.Ozone.monthly.ts.decomposed)
+Garinger.Ozone.monthly.ts.decomposed <- stl(Garinger.Ozone.monthly.ts, s.window = "periodic")
+plot(Garinger.Ozone.monthly.ts.decomposed)
 
-Grainger.Ozone.daily.ts.decomposed <- stl(Grainger.Ozone.daily.ts, s.window = "periodic")
-plot(Grainger.Ozone.daily.ts.decomposed)
+Garinger.Ozone.daily.ts.decomposed <- stl(Garinger.Ozone.daily.ts, s.window = "periodic")
+plot(Garinger.Ozone.daily.ts.decomposed)
 
 ```
 
@@ -201,9 +209,9 @@ plot(Grainger.Ozone.daily.ts.decomposed)
 
 ```{r}
 #12
-# Run SMK test
-Grainger.Ozone.monthly.ts.trend <- Kendall::SeasonalMannKendall(Grainger.Ozone.monthly.ts)
-summary(Grainger.Ozone.monthly.ts.trend)
+#Run SMK test
+Garinger.Ozone.monthly.ts.trend <- Kendall::SeasonalMannKendall(Garinger.Ozone.monthly.ts)
+summary(Garinger.Ozone.monthly.ts.trend)
 
 ```
 
@@ -213,28 +221,21 @@ summary(Grainger.Ozone.monthly.ts.trend)
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
 ```{r}
-# 13
-# We can extract the components and turn them into data frames
-EnoDischarge.late_Components <- as.data.frame(EnoDischarge.late_Decomposed$time.series[,1:3])
-
-EnoDischarge.late_Components <- mutate(EnoDischarge.late_Components,
-        Observed = EnoDischarge.late$discharge.mean,     
-        Date = EnoDischarge.late$datetime)
-
-# Visualize how the trend maps onto the data
-ggplot(EnoDischarge.late_Components) +
-  geom_line(aes(y = Observed, x = Date),  size = 0.25) +
-  geom_line(aes(y = trend, x = Date), color = "#c13d75ff") +
-  geom_hline(yintercept = 0, lty = 2) +
-  ylab(expression("Discharge (ft"^3*"/s)")) +
-  xlab()
-
+#13
+GaringerOzoneMonthlyPlot <- 
+  ggplot(GaringerOzone.monthly) +
+  geom_line(aes(y = Month_Mean_O3, x = Date_M_Y), color = "green") +
+  geom_point(aes(y = Month_Mean_O3, x = Date_M_Y), color = "#c13d75ff") +
+  ylab("Mean Monthly Ozone Concentrations (ppm)") +
+  xlab("Date")
+print(GaringerOzoneMonthlyPlot)
 
 ```
 
 14. To accompany your graph, summarize your results in context of the research question. Include output from the statistical test in parentheses at the end of your sentence. Feel free to use multiple sentences in your interpretation.
 
-> Answer: 
+> Answer: Based on the graphs, there appear to be seasonal trends. Each year, the seasonal graph has the same pattern present and there does not seem to be much variation in the trend with a small remainder.The statistical test from the seasonl Mann-Kendall returned a p-value of 0.0467, which is less than an alpha value of 0.05. Therefore we would say that there is seasonal trends occuring over the years (Score =  -77 , Var(Score) = 1499, denominator =  539.4972, tau = -0.143, 2-sided pvalue =0.046724).
+
 
 15. Subtract the seasonal component from the `GaringerOzone.monthly.ts`. Hint: Look at how we extracted the series components for the EnoDischarge on the lesson Rmd file.
 
@@ -242,21 +243,22 @@ ggplot(EnoDischarge.late_Components) +
 
 ```{r}
 #15
-EnoDischarge.late_Components <- as.data.frame(EnoDischarge.late_Decomposed$time.series[,1:3])
+Garinger.No.Seasonality <- as.data.frame(Garinger.Ozone.monthly.ts.decomposed$time.series[,2:3])
 
-EnoDischarge.late_Components <- mutate(EnoDischarge.late_Components,
-        Observed = EnoDischarge.late$discharge.mean,     
-        Date = EnoDischarge.late$datetime)
+f_month <- month(first(GaringerOzone_interp$Date))
+f_year <- year(first(GaringerOzone_interp$Date))
+
+Garinger.Ozone.monthly.No.Seasonality.ts <- ts(Garinger.No.Seasonality, start = c(f_year, f_month), frequency = 12)
 
 #16
-# Run SMK test
-Grainger.Ozone.monthly.ts.trend <- Kendall::SeasonalMannKendall(Grainger.Ozone.monthly.ts)
-summary(Grainger.Ozone.monthly.ts.trend)
-
 #Run MK test
-Grainger.Ozone.daily.ts.trend <- MannKendall(Grainger.Ozone.daily.ts)
-summary(Grainger.Ozone.daily.ts.trend)
+Garinger.No.Seasonality.Monthly.trend <- MannKendall(Garinger.Ozone.monthly.No.Seasonality.ts)
+summary(Garinger.No.Seasonality.Monthly.trend)
+
+# Run SMK test
+Garinger.Ozone.monthly.ts.trend <- Kendall::SeasonalMannKendall(Garinger.Ozone.monthly.ts)
+summary(Garinger.Ozone.monthly.ts.trend)
 
 ```
 
-> Answer: 
+> Answer: The results for the non-seasonal Ozone monthly series have a very small p-value that is less than an alpha of 0.05. Therefore, we would say that there are trends occuring in the non-seasonal Ozone monthly data (Score =  -16300 , Var(Score) = 1545533, denominator =  28680, tau = -0.568, 2-sided pvalue =< 2.22e-16). Both the Mann Kendal test and the seasonal Mann Kendall test produce p-values that are smaller than 0.05. Therefore we would say that there are both season trends and non-seasonal trends occuring in the Ozone monthly series data.

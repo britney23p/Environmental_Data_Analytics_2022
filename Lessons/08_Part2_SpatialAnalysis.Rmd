@@ -141,7 +141,8 @@ ggplot() +
 ```{r Select the Upper Neuse HUC 8}
 #Read the shapefile into an sf dataframe
 neuse <- st_read('./Data/Spatial/NCHHUC8.shp') %>%
-  neuse <- st_read
+  neuse <- st_read() %>%
+  filter(SUBBASIN == 'Upper Neuse')
 
 ##watch video for rest
 
@@ -149,7 +150,6 @@ neuse <- st_read('./Data/Spatial/NCHHUC8.shp') %>%
 #Create a map
 ggplot() + 
   geom_sf(data=huc8_sf, fill='orange') + 
-  geom_sf(data=neuse, fill='purple')
 
 
 ```

@@ -1,6 +1,6 @@
 ---
 title: "Assignment 9: Spatial Analysis in R"
-author: "Student Name"
+author: "Britney Pepper"
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -30,10 +30,24 @@ This exercise accompanies the lessons in Environmental Data Analytics (ENV872L) 
 
 ```{r Prepare workspace}
 #1.
-
+getwd()
 
 #2. 
+install.packages("lubridate")
+install.packages("tidyverse")
+install.packages("sf")
+install.packages("leaflet")
+install.packages("mapview")
+install.packages("ggplot2")
+install.packages("RColorBrewer")
 
+library(lubridate)
+library(tidyverse)
+library(sf)
+library(leaflet)
+library(mapview)
+library(ggplot2)
+library(RColorBrewer)
 
 ```
 
@@ -47,19 +61,25 @@ In this exercise, we will be exploring stream gage height data in Nebraska corre
 
 ```{r Read the county data into an sf dataframe}
 #3. Read in Counties shapefile into an sf dataframe, filtering for just NE counties
-
+Nebraska_counties <- st_read('/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Spatial/cb_2018_us_county_20m.shp') %>%
+  filter(STATEFP == 31)
 
 #4. Reveal the CRS of the counties features
-
+Nebraska_counties_CRS <- st_crs(Nebraska_counties)$epsg
+print(Nebraska_counties_CRS)
+#this returns the EPSG code 4269 for the associated CRS 
 
 #5. Plot the data
+Nebraska_counties_plot <- ggplot(data=Nebraska_counties) +
+  geom_sf()
+plot(Nebraska_counties_plot)
 
 ```
 
 6. What is the EPSG code of the Counties dataset? Is this a geographic or a projected coordinate reference system? (Or, does this CRS use angular or planar coordinate units?) To what datum is this CRS associated? (Tip: look the EPSG code on <https://spatialreference.org>) 
 
 > ANSWER: 
-> 
+>The EPSG code of the Counties dataset is 4269.This is a projected coordinate reference system. The datum that is associated with the CRS is NAD83.
 
 
 ### Read in gage locations csv as a dataframe, then display the column names it contains
@@ -72,16 +92,17 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 
 ```{r Read in USGS Gage Locations}
 #7. Read in gage locations csv as a dataframe
-
+gage_locations <- read.csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/NWIS_SiteInfo_NE_RAW.csv", 
+                           stringsAsFactors = TRUE)
 
 #8. Reveal the names of the columns
-
+colnames(gage_locations)
 
 ```
 
 9. What columns in the dataset contain the x and y coordinate values, respectively?  
 > ANSWER:
-> 
+> The column "dec_lat_va" contains the y coordinate values and the "dec_long_va" column containes the x coordinate values.
 
 
 ### Convert the dataframe to a spatial features ("sf") dataframe
@@ -93,17 +114,19 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 
 ```{r Convert dataframe to sf dataframe}
 #10. Convert to an sf object
-
+gage_locations_sf <- read_csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/NWIS_SiteInfo_NE_RAW.csv") %>% 
+  group_by(site_no, station_nm, site_tp_cd, dec_lat_va, dec_long_va, coord_acy_cd, dec_coord_datum_cd) %>% 
+  st_as_sf(coords = c('dec_long_va','dec_lat_va'), crs=4269)
 
 #11. Re-examine the column names
-
+colnames(gage_locations_sf)
 
 ```
 
 12. What new field(s) appear in the sf dataframe created? What field(s), if any, disappeared?
 
->ANSWER: 
->
+>ANSWER:
+>There is a new field called "geometry" appeared in the sf dataframe we created and the  "dec_lat_va" and "dec_long_va" fields disappeared.
 
 
 ### Plot the gage locations on top of the counties
@@ -115,9 +138,15 @@ Next we'll read in some USGS/NWIS gage location data added to the `Data/Raw` fol
 
 ```{r Plot the spatial features}
 #13. Plot the gage locations atop the county features
+gage_counties_ggplot1 <- 
+  ggplot() +
+  geom_sf(data=Nebraska_counties,fill='light blue') + 
+  geom_sf(data=gage_locations_sf, fill='green')
+print(gage_counties_ggplot1 +
+        ggtitle("NWIS Gage Locations in Nebraska") +
+        labs(subtitle = "Britney Pepper"))
 
-
-```
+```  
 
 
 ### Read in the gage height data and join the site location data to it.
@@ -134,18 +163,25 @@ Lastly, we want to attach some gage height data to our site locations. I've cons
 
 ```{r}
 #14. Read the site flow data into a data frame
+nwis_gage_sites <- read.csv("/Users/BritneyPepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/NWIS_SiteFlowData_NE_RAW.csv", stringsAsFactors = TRUE)
 
 
 #15. Show the column names
+colnames(nwis_gage_sites)
 
 
 #16. Join location data to it
-
+counties_sf_join <-  merge(gage_locations_sf, 
+                           nwis_gage_sites,
+                           by = c("site_no", "station_nm"))
 
 #17. Show the column names of the joined dataset
-
+colnames(counties_sf_join)
 
 #18. Show the dimensions of this joined dataset
+dim(counties_sf_join)
+nrow(counties_sf_join)
+ncol(counties_sf_join)
 
 
 ```
@@ -158,10 +194,16 @@ Now we can examine where the flooding appears most acute by visualizing gage hei
 
 ```{r}
 #Map the points, sized by gage height
-
+gage_counties_ggplot2
 
 #ggplot
-
+gage_counties_ggplot2 <- 
+  ggplot() +
+  geom_sf(data=,fill='light blue') + 
+  geom_sf(data=, fill='green')
+print(gage_counties_ggplot2 +
+        ggtitle("NWIS Gage Locations in Nebraska") +
+        labs(subtitle = "Britney Pepper"))
 
 ```
 
@@ -179,10 +221,17 @@ Up next we will do some spatial analysis with our data. To prepare for this, we 
 
 ```{r}
 #20 Transform the counties and gage location datasets to UTM Zone 14
-
+Nebraska_counties_utm <- st_transform(Nebraska_counties, crs = 32614)
+gage_locations_sf_utm <- st_transform(gage_locations_sf, crs = 32614)
 
 #21 Plot the data
-
+gage_counties_ggplot2_utm <- 
+  ggplot() +
+  geom_sf(data=Nebraska_counties_utm,fill='light blue') + 
+  geom_sf(data=gage_locations_sf_utm, fill='green')
+print(gage_counties_ggplot2_utm +
+        ggtitle("NWIS Gage Locations in Nebraska") +
+        labs(subtitle = "Britney Pepper"))
 
 ```
 

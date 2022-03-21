@@ -104,6 +104,27 @@ ggplot(gage_data,aes(x=datetime,y=discharge_cfs)) +
 ### Exercise: 
 > Alter the above code so that it plots the last 24 days of flow for gage 02085070
 
+```{r pull.and.plot.discharge.data}
+#Set the URL
+theURL <- 'https://waterdata.usgs.gov/nwis/uv?search_site_no=02087500&period=7&format=rdb'
+
+#Get the data, which starts on line 30
+gage_data <- read.table(theURL,skip = 29,header=TRUE,sep='\t') 
+
+#Update the column headers
+colnames(gage_data) = c("agency_cd", "site_no", "datetime", "tz_cd",
+                        "discharge_cfs", "89192_00060_cd", "gage_ht_ft", "89193_00065_cd")
+#Tidy the data
+gage_data <- gage_data %>% 
+  select(datetime, discharge_cfs,gage_ht_ft) %>% 
+  mutate(datetime = ymd_hm(datetime))
+
+#Plot
+ggplot(gage_data,aes(x=datetime,y=discharge_cfs)) + 
+  geom_line() +
+  labs(x = "Date",y = "Discharge (cfs)")
+```
+
 ## APIs
 
 Application programming interfaces, or APIs, are a formalization of the REST request/response process. More precisely, they are web sites that have been designed to allow a client to query specific bits of data from an on-line resource without just "hacking" a URL.
@@ -203,46 +224,71 @@ The RVest scraping workflow is as follows:
 
 ```{r eval=FALSE}
 #1 Link to the web site using read_html
-the_website
+the_website <- read_html('https://www.eia.gov/electricity/state/')
 
 #2&3 Locate elements and read their text attributes into variables
-the_states <- 
-the_price <- 
-the_capacity <- 
-net_generation <- 
-total_retail <- 
+the_states <- the_website %>% html_nodes('.basic_table a') %>% html_text()
+the_price <- the_website %>% html_nodes('td:nth-child(2)') %>% html_text()
+the_capacity <- the_website %>% html_nodes('td:nth-child(3)') %>% html_text()
+net_generation <- the_website %>% html_nodes('td:nth-child(4)') %>% html_text()
+total_retail <- the_website %>% html_nodes('td:nth-child(5)') %>% html_text()
   
 #3 Construct a dataframe from the values
+the_df <- data.frame(
+  "State" = the_states,
+  "Price" = as.numeric(the_price),
+  "Capacity" = as.numeric(gsub(",","",the_capacity)),
+  "Generation" = as.numeric(gsub(",","",net_generation)),
+  "Retail Value" = as.numeric(gsub(",","",total_retail)),
+  year = 2019
+)
+
+#gsub = substitutes something for something else 
+# in this examples, the comma is substituted with nothing
 ```
 
 
 ```{r create.scrape.function}
 scrape.it <- function(the_year){
   #Get the proper url
-  the_url <- ifelse(the_year==2019,
+  the_url <- ifelse(the_year==2020,
                     'https://www.eia.gov/electricity/state/',
-                    paste('https://www.eia.gov/electricity/state/archive',the_year,'/'))
+                    paste('https://www.eia.gov/electricity/state/archive/',the_year,'/'))
 
-  #Fetch the website
-  #<enter code from above here> 
   
-  #Scrape the data
-  #<enter code from above here>
+    #1 Link to the web site using read_html
+  the_website <- read_html(the_url)
   
-  #Convert to dataframe
-  #<enter code from above here>
-  
+  #2&3 Locate elements and read their text attributes into variables
+  the_states <- the_website %>% html_nodes('.basic_table a') %>% html_text()
+  the_price <- the_website %>% html_nodes('td:nth-child(2)') %>% html_text()
+  the_capacity <- the_website %>% html_nodes('td:nth-child(3)') %>% html_text()
+  net_generation <- the_website %>% html_nodes('td:nth-child(4)') %>% html_text()
+  total_retail <- the_website %>% html_nodes('td:nth-child(5)') %>% html_text()
+    
+  #3 Construct a dataframe from the values
+  the_df <- data.frame(
+    "State" = the_states,
+    "Price" = as.numeric(the_price),
+    "Capacity" = as.numeric(gsub(",","",the_capacity)),
+    "Generation" = as.numeric(gsub(",","",net_generation)),
+    "Retail Value" = as.numeric(gsub(",","",total_retail)),
+    year = the_year
+  )
+
   #Return the dataframe
   return(the_df)
 }
 
-
 # Use the above function to scrape data for 2017
-
+df2017 <- scrape.it(2017)
 
 # Map the function to scrape data from 2017 to 2020
+the_yests <- seq(2017, 2019)
+the_dfs <- lappy(X= the_years, FUN = scrape.it) %>% bind_rows()
 
-
+#tidyverse version to Map the function to scrape data from 2017 to 2020
+the_dfs2 <- map(the_years,scrape.it) %>% bind_rows()
 ```
 
 

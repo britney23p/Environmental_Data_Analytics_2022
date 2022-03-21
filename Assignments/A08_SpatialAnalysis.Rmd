@@ -270,7 +270,7 @@ gage_counties_ggplot3 <-
   geom_sf(data=gage_sites_in_lancaster_county_sf_1, fill = 'dark blue') +
   geom_sf(data=gage_sites_in_lancaster_county_sf_2, color = 'purple')
 print(gage_counties_ggplot3 +
-        ggtitle("Gage Locations in Lancaster County, Nebraska") +
+        ggtitle("Gage Locations in Lancaster County, Nebraska.") +
         labs(subtitle = "Britney Pepper"))
 
 ```

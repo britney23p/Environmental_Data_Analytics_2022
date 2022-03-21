@@ -29,17 +29,21 @@ This exercise accompanies the lessons in Environmental Data Analytics (ENV872L) 
 2. Import libraries: tidyverse, sf, leaflet, and mapview
 
 ```{r Prepare workspace}
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=50),tidy=TRUE, echo = T)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=60), tidy=TRUE, echo=TRUE)
+
 #1.
 getwd()
 
 #2. 
-install.packages("lubridate")
-install.packages("tidyverse")
-install.packages("sf")
-install.packages("leaflet")
-install.packages("mapview")
-install.packages("ggplot2")
-install.packages("RColorBrewer")
+#install.packages("lubridate")
+#install.packages("tidyverse")
+#install.packages("sf")
+#install.packages("leaflet")
+#install.packages("mapview")
+#install.packages("ggplot2")
+#install.packages("RColorBrewer")
 
 library(lubridate)
 library(tidyverse)
@@ -79,7 +83,7 @@ plot(Nebraska_counties_plot)
 6. What is the EPSG code of the Counties dataset? Is this a geographic or a projected coordinate reference system? (Or, does this CRS use angular or planar coordinate units?) To what datum is this CRS associated? (Tip: look the EPSG code on <https://spatialreference.org>) 
 
 > ANSWER: 
->The EPSG code of the Counties dataset is 4269.This is a projected coordinate reference system. The datum that is associated with the CRS is NAD83.
+>The EPSG code of the Counties dataset is 4269. This is a geographic coordinate reference system because the coordinates are measured in degrees of latitude and longitude. The datum that is associated with the CRS is NAD83.
 
 
 ### Read in gage locations csv as a dataframe, then display the column names it contains
@@ -117,6 +121,8 @@ colnames(gage_locations)
 gage_locations_sf <- read_csv("/Users/britneypepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/NWIS_SiteInfo_NE_RAW.csv") %>% 
   group_by(site_no, station_nm, site_tp_cd, dec_lat_va, dec_long_va, coord_acy_cd, dec_coord_datum_cd) %>% 
   st_as_sf(coords = c('dec_long_va','dec_lat_va'), crs=4269)
+#Sorry that you can't see the end of the read_csv line. There is a %>% at the end of it so that the pipe works.
+
 
 #11. Re-examine the column names
 colnames(gage_locations_sf)
@@ -141,7 +147,7 @@ colnames(gage_locations_sf)
 gage_counties_ggplot1 <- 
   ggplot() +
   geom_sf(data=Nebraska_counties,fill='light blue') + 
-  geom_sf(data=gage_locations_sf, fill='green')
+  geom_sf(data=gage_locations_sf, color='dark green')
 print(gage_counties_ggplot1 +
         ggtitle("NWIS Gage Locations in Nebraska") +
         labs(subtitle = "Britney Pepper"))
@@ -163,7 +169,9 @@ Lastly, we want to attach some gage height data to our site locations. I've cons
 
 ```{r}
 #14. Read the site flow data into a data frame
-nwis_gage_sites <- read.csv("/Users/BritneyPepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/NWIS_SiteFlowData_NE_RAW.csv", stringsAsFactors = TRUE)
+nwis_gage_sites <- read.csv("/Users/BritneyPepper/Desktop/ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/NWIS_SiteFlowData_NE_RAW.csv", 
+                            colClasses = c('site_no' = 'factor'), 
+                            stringsAsFactors = TRUE)
 
 
 #15. Show the column names
@@ -183,7 +191,6 @@ dim(counties_sf_join)
 nrow(counties_sf_join)
 ncol(counties_sf_join)
 
-
 ```
 
 ### Map the pattern of gage height data
@@ -194,15 +201,12 @@ Now we can examine where the flooding appears most acute by visualizing gage hei
 
 ```{r}
 #Map the points, sized by gage height
-gage_counties_ggplot2
-
-#ggplot
 gage_counties_ggplot2 <- 
   ggplot() +
-  geom_sf(data=,fill='light blue') + 
-  geom_sf(data=, fill='green')
+  geom_sf(data=Nebraska_counties, fill='light blue', size = 0.5) + 
+  geom_sf(data=counties_sf_join, aes(size = gage_ht, color=gage_ht))
 print(gage_counties_ggplot2 +
-        ggtitle("NWIS Gage Locations in Nebraska") +
+        ggtitle("Flooding Patterns in Gage Locations in Nebraska") +
         labs(subtitle = "Britney Pepper"))
 
 ```
@@ -227,10 +231,10 @@ gage_locations_sf_utm <- st_transform(gage_locations_sf, crs = 32614)
 #21 Plot the data
 gage_counties_ggplot2_utm <- 
   ggplot() +
-  geom_sf(data=Nebraska_counties_utm,fill='light blue') + 
-  geom_sf(data=gage_locations_sf_utm, fill='green')
+  geom_sf(data=Nebraska_counties_utm, fill='light blue') + 
+  geom_sf(data=gage_locations_sf_utm, color='dark green')
 print(gage_counties_ggplot2_utm +
-        ggtitle("NWIS Gage Locations in Nebraska") +
+        ggtitle("Gage Locations in Nebraska (UTM Zone 14N)") +
         labs(subtitle = "Britney Pepper"))
 
 ```
@@ -249,13 +253,24 @@ Now let's zoom into a particular county and examine the gages located there.
 
 ```{r}
 #22 Select the county
+lancaster_county_sf <- 
+  Nebraska_counties %>%
+  filter(NAME == "Lancaster")
 
+gage_sites_in_lancaster_county_sf_1 <- lancaster_county_sf[gage_locations_sf,]
 
 #23 Select gages within the selected county
-
+gage_sites_in_lancaster_county_sf_2 <- gage_locations_sf[lancaster_county_sf,]
 
 #24 Plot
-
-
+gage_counties_ggplot3 <- 
+  ggplot() +
+  geom_sf(data=Nebraska_counties, fill='light blue') + 
+  geom_sf(data=gage_locations_sf, color='dark green')+
+  geom_sf(data=gage_sites_in_lancaster_county_sf_1, fill = 'dark blue') +
+  geom_sf(data=gage_sites_in_lancaster_county_sf_2, color = 'purple')
+print(gage_counties_ggplot3 +
+        ggtitle("Gage Locations in Lancaster County, Nebraska") +
+        labs(subtitle = "Britney Pepper"))
 
 ```

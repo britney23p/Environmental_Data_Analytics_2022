@@ -193,6 +193,8 @@ scrape.it <- function(the_year, the_facility){
   return(df_withdrawals)
 }
 
+
+
 ```
 
 7. Use the function above to extract and plot max daily withdrawals for Durham (PWSID='03-32-010') for each month in 2015

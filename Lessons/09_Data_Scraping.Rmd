@@ -19,7 +19,7 @@ getwd()
 library(tidyverse)
 library(lubridate)
 
-#install.packages("rvest")
+install.packages("rvest")
 library(rvest)
 
 # Set theme
@@ -98,6 +98,8 @@ the_registrant <- webpage %>%
   html_text()
 the_registrant
 ```
+
+my result: ".table tr:nth-child(1) td:nth-child(2)"  
 
 EXERCISE:
 In the code chunk below, see if you can extract the Facility Name and Facility Type from the web page. 

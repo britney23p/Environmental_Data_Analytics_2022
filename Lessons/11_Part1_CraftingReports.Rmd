@@ -1,11 +1,17 @@
 ---
 title: '11: Crafting Reports'
+subtitle: Britney Pepper
 author: Environmental Data Analytics | John Fay & Luana Lima | Developed by Kateri Salk
 date: "Spring 2022"
 output:
  pdf_document: default
 
 ---
+```{r - setup1}
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=50),tidy=TRUE, echo = T)
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=50), tidy=TRUE, echo=TRUE)
+```
 
 ## LESSON OBJECTIVES
 
@@ -65,14 +71,25 @@ See: <https://rmarkdown.rstudio.com> and class recording.
 
 <Fill in our discussion below with bullet points. Use italics and bold for emphasis (hint: use the cheat sheets or `Help` →`Markdown Quick Reference` to figure out how to make bold and italic text).> 
 
-* you can create sections of code
-* it is very easy to edit a file and re-run the code in R markdown
-* user friendly
++ Combine code and formatted text
++ Reproducibility and collaboration
++ Run code in chunks/intervals
++ Embedded tables and plots that are easily updated
++ Version control
++ User friendly, low learning curve
 
+1. **Bold**
+2. *Italic*
 
 ## TEXT EDITING CHALLENGE
 
 Create a table below that details the example datasets we have been using in class. The first column should contain the names of the datasets and the second column should include some relevant information about the datasets. (Hint: use the cheat sheets to figure out how to make a table in Rmd)
+
+File Name                     | Description
+----------------------------  | ---------------------
+EPAair_O3_NC2019_raw.csv      | O3 Concentrations in North Carolina, 2019
+NTL-LTER_Lake_Carbon_Raw.csv  | NTL LTER Lake: Carbon Data
+
 
 
 ## R CHUNK EDITING CHALLENGE
@@ -95,8 +112,29 @@ Load the NTL-LTER_Lake_Nutrients_Raw dataset, display the head of the dataset, a
 Customize the chunk options such that the code is run but is not displayed in the final document.
 
 ```{r - setup, include=FALSE}
+#working directory
+getwd()
 
+#load packages
+library(tidyverse)
+library(lubridate)
+library(knitr)
 
+#theme
+mytheme <- theme_classic(base_size = 14) +
+  theme(axis.text = element_text(color = "black"), 
+        legend.position = "top")
+theme_set(mytheme)
+
+#load the data
+NTL_LTER_Raw <- read.csv("/Users/britneypepper/Desktop//ENVIRON 872 and L/GitHubRepositories/Environmental_Data_Analytics_2022/Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv")
+
+#head of the dataset
+colnames(NTL_LTER_Raw)
+head(NTL_LTER_Raw, n=5)
+
+#set date format
+NTL_LTER_Raw$sampledate <- as.Date(NTL_LTER_Raw$sampledate, format = "%m/%d/%y")
 
 ```
 
@@ -115,14 +153,96 @@ Create a third R chunk that uses the function `kable` in the knitr package to di
 
 Create a fourth and fifth R chunk that generates two plots (one in each chunk): one for total N over time with different colors for each lake, and one with the same setup but for total P. Decide which geom option will be appropriate for your purpose, and select a color palette that is visually pleasing and accessible. Customize the chunk options such that the final figures are displayed but not the code used to generate the figures. In addition, customize the chunk options such that the figures are aligned on the left side of the page. Lastly, add a fig.cap chunk option to add a caption (title) to your plot that will display underneath the figure.
 
-```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+```{r - Process the data}
+#Removing columns of data
+NTL_LTER_Wrangle1 <- NTL_LTER_Raw %>%
+  select(lakename, year4, daynum, sampledate, depth, tn_ug, tp_ug, nh34, no23, po4)
+
+#Surface examples with only depth = 0m
+NTL_LTER_Wrangle2 <- filter(NTL_LTER_Wrangle1, depth == 0)
+
+#Remove rows with missing data
+NTL_LTER_Wrangle3 <- na.omit(NTL_LTER_Wrangle2)
 
 ```
 
 
+```{r - summary dataset, include = FALSE}
+
+#Compute summary stats for total nitrogen
+ntl.lter.summary.tn <- NTL_LTER_Wrangle3 %>%
+  group_by(lakename) %>%
+  summarize(
+    mean_tn_ug = mean(tn_ug),
+    min_tn_ug = min(tn_ug),
+    max_tn_ug = max(tn_ug),
+    sd_tn_ug = sd(tn_ug)
+)
+
+#Compute summary stats for total phosphorous
+ntl.lter.summary.tp <- NTL_LTER_Wrangle3 %>%
+  group_by(lakename) %>%
+  summarize(
+    mean_tp_ug = mean(tp_ug),
+    min_tp_ug = min(tp_ug),
+    max_tp_ug = max(tp_ug),
+    sd_tp_ug = sd(tp_ug)
+)
+
+```
+
+
+```{r - kable, echo = FALSE}
+
+kable(ntl.lter.summary.tn, caption = "Table 2: Surface Samples: Total Nitrogen")
+
+kable(ntl.lter.summary.tp, caption = "Table 3: Surface Samples: Total Phosphorous")
+
+
+```
+
+```{r - Plot 1, echo = FALSE, message = FALSE, warning = FALSE, fig.align='left', out.width="85%", fig.cap = "Total Nitrogen"}
+
+ggplot(data=NTL_LTER_Wrangle3, aes(x=sampledate,y=tn_ug,color=lakename)) +
+  geom_point(alpha=0.2) +
+  geom_smooth(se=F) +
+  theme(legend.position = "right") + 
+  labs(
+    title ='Total N over time',
+    x = 'Date',
+    y = expression(paste('Total N (',mu,'g)')),
+    color = "Lake")
+
+
+```
+
+```{r - Plot 2, echo = FALSE, message = FALSE, warning = FALSE, fig.align='left', out.width="85%", fig.cap = "Total Phosphorus"}
+ggplot(data=NTL_LTER_Wrangle3, aes(x=sampledate,y=tp_ug,color=lakename)) +
+  geom_point(alpha=0.2) +
+  geom_smooth(se=F) +
+  theme(legend.position = "right") +
+  labs(
+    title ='Total P over time',
+    x = 'Date',
+    y = expression(paste('Total P (',mu,'g)')),
+    color = "Lake")
+
+```
+
+\newpage
+
 ### Communicating results
 
 Write a paragraph describing your findings from the R coding challenge above. This should be geared toward an educated audience but one that is not necessarily familiar with the dataset. Then insert a horizontal rule below the paragraph. Below the horizontal rule, write another paragraph describing the next steps you might take in analyzing this dataset. What questions might you be able to answer, and what analyses would you conduct to answer those questions?
+
+
+When looking at the graphs, it appears that nitrogen and phosphorus concentrations in each lake follow the same trends. Based off the graphs, when nitrogen increase, phosphorus appears to increase as well. While the phosphorus trends are not as dramatic as the nitrogen, it still follows the pattern. Although the trends in the data appear to be consistent, the year 1996-1998 has a much greater standard deviation in the data for those years. When looking at the tables, you can see that the nitrogen concentrations are greater overall with much wider standard deviations in the data set than phosphorus. 
+
+-----------------
+
+The next steps I might take in analyzying the dataset would be to do linear models to analyze the change in conentrations over the years. It would be able to show whether or not we are increasing the nitrogen and phosphorus concentration levels as the years progress. I also think it might help to look at an individual year to analyze season changes in concentrations of nitrogen and phosphorus for each lake. I would be interested in seeing if there are seasonal trends in concentration levels in each lake. It would help our understanding of when these elements end up in our water systems and provide some insight as to how they end up there (for example, runoff). 
+
+
 
 
 ## KNIT YOUR PDF

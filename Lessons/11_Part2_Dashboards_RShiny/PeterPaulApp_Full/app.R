@@ -12,31 +12,31 @@ nutrient_data <- nutrient_data %>%
 
 #### Define UI ----
 ui <- fluidPage(theme = shinytheme("yeti"),
-  titlePanel("Nutrients in Peter Lake and Paul Lake"),
+  titlePanel("Nutrients in Peter Lake and Paul Lake - Britney Pepper :) "),
   sidebarLayout(
     sidebarPanel(
       
       # Select nutrient to plot
       selectInput(inputId = "y", 
-                  label = "Nutrient",
+                  label = "Nutrient Concentrations",
                   choices = c("tn_ug", "tp_ug", "nh34", "no23", "po4"), 
-                  selected = "tp_ug"),
+                  selected = "tn_ug"),
       
       # Select depth
       checkboxGroupInput(inputId = "fill",
                          label = "Depth ID",
                          choices = unique(nutrient_data$depth_id),
-                         selected = c(1, 7)),
+                         selected = c(1, 2)),
       
       # Select lake
       checkboxGroupInput(inputId = "shape",
-                         label = "Lake",
+                         label = "Lake Name",
                          choices = c("Peter Lake", "Paul Lake"),
                          selected = "Peter Lake"),
 
       # Select date range to be plotted
       sliderInput(inputId = "x",
-                  label = "Date",
+                  label = "Date Range",
                   min = as.Date("1991-05-01"),
                   max = as.Date("2016-12-31"),
                   value = c(as.Date("1995-01-01"), as.Date("1999-12-31")))),
@@ -63,12 +63,12 @@ server <- function(input, output) {
         ggplot(filtered_nutrient_data(), 
                aes_string(x = "sampledate", y = input$y, 
                           fill = "depth_id", shape = "lakename")) +
-          geom_point(alpha = 0.8, size = 2) +
-          theme_classic(base_size = 14) +
+          geom_point(alpha = 0.7, size = 3) +
+          theme_classic(base_size = 19) +
           scale_shape_manual(values = c(21, 24)) +
           labs(x = "Date", y = expression(Concentration ~ (mu*g / L)), shape = "Lake", fill = "Depth ID") +
-          scale_fill_distiller(palette = "YlOrBr", guide = "colorbar", direction = 1)
-          #scale_fill_viridis_c(option = "viridis", begin = 0, end = 0.8, direction = -1)
+          #scale_fill_distiller(palette = "YlOrBr", guide = "colorbar", direction = 1)
+          scale_fill_viridis_c(option = "viridis", begin = 0, end = 0.8, direction = -1)
       })
        
     # Create a table that generates data for each point selected on the graph  

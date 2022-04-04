@@ -11,13 +11,13 @@ nutrient_data <- nutrient_data %>%
 
 #### Define UI ----
 ui <- fluidPage(
-  titlePanel("Nutrients in Peter Lake and Paul Lake"),
+  titlePanel("Nutrients in Peter Lake and Paul Lake - Britney Pepper :)"),
   sidebarLayout(
     sidebarPanel(
       
       # Select nutrient to plot
       selectInput(inputId = "dropdown_input", 
-                  label = "Nutrient",
+                  label = "Nutrient Concentration",
                   choices = c("tn_ug", "tp_ug", "nh34", "no23", "po4"), 
                   selected = "tp_ug"),
   
